@@ -1,3 +1,4 @@
 django==4.2
-django-environ==0.10.0
+django-environ==0.11.2 # update version to fix uncampability with Django 4.2    
 djangorestframework==3.14.0
+gunicorn==21.2.0
