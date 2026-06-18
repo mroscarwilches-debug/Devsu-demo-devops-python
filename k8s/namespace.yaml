@@ -1,6 +1,6 @@
-# A namespace is like a folder inside Kubernetes.
-# It keeps all our app resources organized and separated from other apps running in the cluster.
-# Everything we deploy will live inside "demo-devops".
+# Think of a namespace as a folder in your computer.
+# We create one called "demo-devops" so all our app stuff stays together
+# and doesn't get mixed up with anything else running in the cluster.
 apiVersion: v1
 kind: Namespace
 metadata:

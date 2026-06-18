@@ -1,35 +1,29 @@
-# HPA = Horizontal Pod Autoscaler.
-# It watches how much CPU our pods are using and automatically creates or removes pods.
-# This way, the app handles traffic spikes without manual intervention.
+# HPA stands for Horizontal Pod Autoscaler.
+# It keeps an eye on how hard our pods are working (CPU usage)
+# and automatically adds or removes pods to match the demand.
 #
-# How it works:
-#   - We always have at least 2 pods running (high availability).
-#   - If average CPU usage goes above 70%, Kubernetes adds more pods (up to 5).
-#   - When the load drops, it scales back down to 2.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: demo-devops-hpa
   namespace: demo-devops
 spec:
-  # Which Deployment this autoscaler controls
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: demo-devops-deployment
 
-  # Minimum number of pods — never go below 2 so the app is always available
+  # Always keep at least 2 pods — if one crashes, the other is still there
   minReplicas: 2
 
-  # Maximum number of pods — cap at 5 to avoid using too many resources
+  # Don't go above 5 pods — we don't want to use too many resources
   maxReplicas: 5
 
-  # Scale based on CPU usage
+  # The rule: scale up when average CPU across all pods goes above 70%
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
-          # When the average CPU across all pods exceeds 70%, create a new pod
           type: Utilization
           averageUtilization: 70

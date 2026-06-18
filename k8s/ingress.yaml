@@ -1,28 +1,22 @@
-# The Ingress is the front door of our app — it exposes the Service to the outside world.
-# Without it, the app would only be reachable from inside the cluster.
-# It routes external HTTP requests to our Service based on the hostname.
-#
-# To test locally with minikube, add this line to your hosts file:
-#   <minikube-ip>  demo-devops.local
-#
-# On Windows the hosts file is at: C:\Windows\System32\drivers\etc\hosts
-# On Linux/Mac: /etc/hosts
+# It works like a traffic cop: when someone visits "demo-devops.local",
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: demo-devops-ingress
   namespace: demo-devops
   annotations:
-    # This tells the Ingress controller to rewrite the URL path before forwarding the request
+    # Tells the NGINX controller to clean up the URL path before passing it to our app
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  # We use the NGINX Ingress Controller — the most common one for local and cloud setups
+  # We're using NGINX as our Ingress controller — it's the most popular choice
   ingressClassName: nginx
   rules:
-    # When someone visits "demo-devops.local", route the traffic to our Service
+    # Route all traffic coming to "demo-devops.local" to our Service
     - host: demo-devops.local
       http:
         paths:
+          # Any path starting with "/" goes to our service on port 80
           - path: /
             pathType: Prefix
             backend:
