@@ -1,0 +1,14 @@
+# We put here all the config values that are safe to share (no passwords or keys).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-devops-config
+  namespace: demo-devops
+data:
+  DATABASE_NAME: "db.sqlite3"
+
+  # Which domains can access our app — "*" means we accept requests from anywhere
+  ALLOWED_HOSTS: "*"
+
+  # We turn off debug mode in production — it hides error details from users for security
+  DEBUG: "False"

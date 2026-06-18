@@ -1,0 +1,26 @@
+# It works like a traffic cop: when someone visits "demo-devops.local",
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-devops-ingress
+  namespace: demo-devops
+  annotations:
+    # Tells the NGINX controller to clean up the URL path before passing it to our app
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  # We're using NGINX as our Ingress controller — it's the most popular choice
+  ingressClassName: nginx
+  rules:
+    # Route all traffic coming to "demo-devops.local" to our Service
+    - host: demo-devops.local
+      http:
+        paths:
+          # Any path starting with "/" goes to our service on port 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: demo-devops-service
+                port:
+                  number: 80

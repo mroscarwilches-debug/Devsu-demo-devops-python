@@ -1,0 +1,73 @@
+# This file defines a Kubernetes Deployment for our Django app.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-devops-deployment
+  namespace: demo-devops
+  labels:
+    app: demo-devops
+spec:
+  # We want 2 copies of our app running at all times.
+  replicas: 2
+
+  # Kubernetes uses this label to know which pods belong to this deployment.
+  selector:
+    matchLabels:
+      app: demo-devops
+
+  template:
+    metadata:
+      labels:
+        app: demo-devops
+    spec:
+      containers:
+        - name: demo-devops
+
+          # This is the Docker image we built.
+          image: demo-devops-python:latest
+
+          # The port our app listens on (gunicorn runs on 8000)
+          ports:
+            - containerPort: 8000
+
+          # Grab the non-sensitive config from our ConfigMap (DATABASE_NAME, ALLOWED_HOSTS, DEBUG)
+          envFrom:
+            - configMapRef:
+                name: demo-devops-config
+
+          # Grab the sensitive config from our Secret (DJANGO_SECRET_KEY)
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-devops-secret
+                  key: DJANGO_SECRET_KEY
+
+          # How much CPU and memory each pod can use.
+          resources:
+            # "requests" is what Kubernetes guarantees to each pod
+            requests:
+              cpu: "50m"       # 5% of one CPU core — enough for a light API
+              memory: "128Mi"  # 128 MB of RAM
+            # "limits" is the maximum — if a pod tries to use more, Kubernetes steps in
+            limits:
+              cpu: "200m"      # 20% of one CPU core
+              memory: "256Mi"  # 256 MB of RAM — enough for 2 gunicorn workers
+
+          # Kubernetes hits this endpoint every 30 seconds.
+          # If it fails 3 times in a row, the pod gets restarted automatically.
+          livenessProbe:
+            httpGet:
+              path: /api/users/
+              port: 8000
+            initialDelaySeconds: 10  # give the app 10 seconds to start up
+            periodSeconds: 30        # then check every 30 seconds
+
+          # Until this passes, Kubernetes won't send any traffic to the pod.
+          # This protects users from hitting a pod that's still starting up.
+          readinessProbe:
+            httpGet:
+              path: /api/users/
+              port: 8000
+            initialDelaySeconds: 5   # check sooner since we just need the app to respond
+            periodSeconds: 10        # check every 10 seconds

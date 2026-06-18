@@ -1,0 +1,7 @@
+# Think of a namespace as a folder in your computer.
+# We create one called "demo-devops" so all our app stuff stays together
+# and doesn't get mixed up with anything else running in the cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-devops

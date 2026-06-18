@@ -1,0 +1,20 @@
+# Pods can come and go (they get new IPs every time), but the Service stays the same.
+# Other resources (like the Ingress) talk to the Service, and it forwards traffic to our pods.
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-devops-service
+  namespace: demo-devops
+spec:
+  selector:
+    app: demo-devops
+
+  ports:
+    - protocol: TCP
+      # The port other resources use to reach this service
+      port: 80
+      # The actual port inside our pods where gunicorn is listening
+      targetPort: 8000
+
+  # ClusterIP means this service is only visible inside the cluster.
+  type: ClusterIP
