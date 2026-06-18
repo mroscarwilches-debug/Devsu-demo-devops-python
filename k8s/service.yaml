@@ -1,0 +1,21 @@
+# A Service is the internal "phone number" for our app inside the cluster.
+# Other resources (like the Ingress) use this Service to reach our pods.
+# It receives traffic on port 80 and forwards it to port 8000 where gunicorn is listening.
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-devops-service
+  namespace: demo-devops
+spec:
+  # Match pods that have the label "app: demo-devops" — those are our Django pods.
+  selector:
+    app: demo-devops
+  ports:
+      # External port (what other resources in the cluster use to reach this service)
+    - protocol: TCP
+      port: 80
+      # Internal port (where gunicorn is actually listening inside the pod)
+      targetPort: 8000
+  # ClusterIP means this service is only accessible inside the cluster.
+  # The Ingress will handle external access.
+  type: ClusterIP

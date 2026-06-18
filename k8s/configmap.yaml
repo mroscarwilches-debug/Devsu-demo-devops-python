@@ -1,0 +1,17 @@
+# A ConfigMap is where we store configuration values that are NOT sensitive.
+# Think of it as a .env file, but managed by Kubernetes.
+# These values are injected into the containers as environment variables at runtime.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-devops-config
+  namespace: demo-devops
+data:
+  # The name of the SQLite database file that Django will create
+  DATABASE_NAME: "db.sqlite3"
+
+  # Which hosts are allowed to access the app. "*" means any host.
+  ALLOWED_HOSTS: "*"
+
+  # Debug mode should always be off in production for security reasons.
+  DEBUG: "False"

@@ -1,0 +1,74 @@
+# The Deployment is the main file — it tells Kubernetes how to run our app.
+# It defines: which Docker image to use, how many copies (replicas) to run,
+# how much CPU/memory each pod gets, and how to check if the app is healthy.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-devops-deployment
+  namespace: demo-devops
+  labels:
+    app: demo-devops
+spec:
+  # We run 2 copies of the app at all times.
+  # If one pod crashes, the other keeps serving traffic while Kubernetes restarts the failed one.
+  replicas: 2
+
+  # This tells Kubernetes which pods belong to this deployment (matched by the "app" label).
+  selector:
+    matchLabels:
+      app: demo-devops
+
+  template:
+    metadata:
+      labels:
+        app: demo-devops
+    spec:
+      containers:
+        - name: demo-devops
+          # The Docker image to run. In production, this would be something like:
+          # username/demo-devops-python:latest (pulled from Docker Hub)
+          image: demo-devops-python:latest
+          ports:
+            - containerPort: 8000
+
+          # Load all non-sensitive env vars from our ConfigMap (DATABASE_NAME, ALLOWED_HOSTS, DEBUG)
+          envFrom:
+            - configMapRef:
+                name: demo-devops-config
+
+          # Load sensitive env vars individually from our Secret
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-devops-secret
+                  key: DJANGO_SECRET_KEY
+
+          # Resource limits — this is a lightweight Django API with SQLite, so we keep it minimal.
+          # "requests" = the minimum guaranteed resources for each pod.
+          # "limits" = the maximum a pod can use before Kubernetes throttles or kills it.
+          resources:
+            requests:
+              cpu: "50m"       # 5% of one CPU core
+              memory: "64Mi"   # 64 megabytes of RAM
+            limits:
+              cpu: "200m"      # 20% of one CPU core
+              memory: "128Mi"  # 128 megabytes of RAM
+
+          # Liveness probe — Kubernetes checks this to know if the app is alive.
+          # If it fails 3 times in a row, Kubernetes will restart the pod.
+          livenessProbe:
+            httpGet:
+              path: /api/users/
+              port: 8000
+            initialDelaySeconds: 10  # Wait 10 seconds before the first check
+            periodSeconds: 30        # Then check every 30 seconds
+
+          # Readiness probe — Kubernetes checks this to know if the app is ready to receive traffic.
+          # A pod won't get any requests until this probe passes.
+          readinessProbe:
+            httpGet:
+              path: /api/users/
+              port: 8000
+            initialDelaySeconds: 5   # Wait 5 seconds before the first check
+            periodSeconds: 10        # Then check every 10 seconds
