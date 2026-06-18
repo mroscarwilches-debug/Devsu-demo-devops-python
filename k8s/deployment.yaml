@@ -48,11 +48,11 @@ spec:
             # "requests" is what Kubernetes guarantees to each pod
             requests:
               cpu: "50m"       # 5% of one CPU core — enough for a light API
-              memory: "64Mi"   # 64 MB of RAM
+              memory: "128Mi"  # 128 MB of RAM
             # "limits" is the maximum — if a pod tries to use more, Kubernetes steps in
             limits:
               cpu: "200m"      # 20% of one CPU core
-              memory: "128Mi"  # 128 MB of RAM
+              memory: "256Mi"  # 256 MB of RAM — enough for 2 gunicorn workers
 
           # Kubernetes hits this endpoint every 30 seconds.
           # If it fails 3 times in a row, the pod gets restarted automatically.
