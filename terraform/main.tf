@@ -1,8 +1,8 @@
 # This file creates:
-#   1. Network (VPC + subnets), resources can talk to each other
-#   2. A Kubernetes cluster (EKS) to run our containers
-#   3. Worker nodes (EC2 servers) that join the cluster and run our app
-#   4. A Docker image registry (ECR) to store our app image
+#  1. Network (VPC + subnets), resources can talk to each other
+#  2. A Kubernetes cluster (EKS) to run our containers
+#  3. Worker nodes (EC2 servers) that join the cluster and run our app
+#  4. A Docker image registry (ECR) to store our app image
 
 
 data "aws_availability_zones" "available" {
@@ -59,7 +59,7 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Connect each subnet to the route table so they can reach the internet ---
+# Connect each subnet to the route table so they can reach the internet
 resource "aws_route_table_association" "public" {
   count = 2
 
@@ -132,7 +132,6 @@ resource "aws_iam_role_policy_attachment" "nodes_ecr" {
   role       = aws_iam_role.eks_nodes.name
 }
 
-# Node Group:
 # These are EC2 instances that Kubernetes uses to schedule pods.
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
