@@ -1,5 +1,5 @@
-# Pods can come and go (they get new IPs every time), but the Service stays the same.
-# Other resources (like the Ingress) talk to the Service, and it forwards traffic to our pods.
+# Pods can get new IPs every time.
+# Resources (like the Ingress) talk to the Service, and it forwards traffic to our pods.
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,5 +16,12 @@ spec:
       # The actual port inside our pods where gunicorn is listening
       targetPort: 8000
 
-  # ClusterIP means this service is only visible inside the cluster.
-  type: ClusterIP
+  # LoadBalancer creates a public URL so anyone can access the app from the internet.
+  # In AWS, this automatically creates an Elastic Load Balancer (ELB).
+  # For local testing (minikube/docker-desktop), use port-forward instead:
+  #   kubectl port-forward -n demo-devops service/demo-devops-service 8080:80
+  #
+  # IMPORTANT: Before running "terraform destroy", always delete K8s resources first:
+  #   kubectl delete namespace demo-devops
+  #   (wait 60 seconds for the ELB to be removed, then **run terraform destroy**)
+  type: LoadBalancer
