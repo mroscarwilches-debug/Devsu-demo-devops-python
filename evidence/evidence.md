@@ -8,7 +8,7 @@ The app was deployed to AWS EKS and exposed at:
 
 http://ab0ac32e9b0f44e659fe6482e2526f75-136789272.us-east-1.elb.amazonaws.com/api/users/
 
-**NOTE: Infrastructure was destroyed after testing to evit costs**
+**NOTE: Infrastructure was destroyed after testing to avoid costs**
 
 ## Local: running the app and tests on the local machine
 
